@@ -1,0 +1,23 @@
+# ninja log v5
+1	901	1709055193107343900	fmt/CMakeFiles/fmt.dir/src/os.cc.o	234fc941f2aac358
+2273	2322	1709058711300472500	libstrlib.a	20ef367c3754ecbb
+1	931	1709056397350096300	test/format/CMakeFiles/test_format.dir/main.cpp.o	7a99e34e6390a97
+760	902	1709060587583041600	test/conversion/test_conversion	7dc722dc72ccecfe
+1	828	1709057246798727600	test/trim/CMakeFiles/test_trim.dir/main.cpp.o	9f4ae3417ae35121
+1936	1990	1709055194192056100	fmt/libfmtd.a	b58385d31cdb4cb2
+2	2273	1709058711246087900	CMakeFiles/strlib.dir/strlib/io.cpp.o	458914e0c629cf90
+1	1935	1709055194136155000	fmt/CMakeFiles/fmt.dir/src/format.cc.o	2121113ed59c9c18
+828	974	1709057246948528800	test/trim/test_trim	e09bcb6ac47f61da
+1	759	1709060587436098800	test/conversion/CMakeFiles/test_conversion.dir/main.cpp.o	3a1e33863ee8a868
+2	1055	1709058710037917000	CMakeFiles/strlib.dir/strlib/string.cpp.o	3a2cb6b20beba35a
+931	1074	1709056397498368700	test/format/test_format	fd215882dd28d001
+1	736	1709063794306883600	test/date/CMakeFiles/test_date.dir/main.cpp.o	12660ad53015efc7
+737	873	1709063794447156300	test/date/test_date	63d06637a66a9316
+2	724	1709063869861408000	test/date/CMakeFiles/test_date.dir/main.cpp.o	12660ad53015efc7
+724	860	1709063870001958500	test/date/test_date	63d06637a66a9316
+1	754	1709063892934227900	test/date/CMakeFiles/test_date.dir/main.cpp.o	12660ad53015efc7
+755	898	1709063893080609000	test/date/test_date	63d06637a66a9316
+1	715	1709063918177847800	test/date/CMakeFiles/test_date.dir/main.cpp.o	12660ad53015efc7
+715	854	1709063918320711500	test/date/test_date	63d06637a66a9316
+2	728	1709063947559567500	test/date/CMakeFiles/test_date.dir/main.cpp.o	12660ad53015efc7
+728	864	1709063947699500600	test/date/test_date	63d06637a66a9316
