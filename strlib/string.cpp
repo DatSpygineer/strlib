@@ -578,3 +578,8 @@ String String::Date(const String& format) {
 
 	return result;
 }
+
+std::istream& String::GetLine(std::istream& is, String& line) {
+	std::string stdLine;
+	return std::getline(is, stdLine);
+}

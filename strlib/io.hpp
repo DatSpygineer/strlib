@@ -1,8 +1,20 @@
 #pragma once
 
-#if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 #include <optional>
 #include "string.hpp"
+
+template<typename ...T>
+inline void Print(const String& message, T&&... args) {
+	printf("%s", String::Format(message, args...).cStr());
+}
+template<typename ...T>
+inline void PrintLn(const String& message, T&&... args) {
+	printf("%s\n", String::Format(message, args...).cStr());
+}
+
+inline String ReadLine() { return String::GetLine(std::cin); }
+
+#if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 
 enum class FileMode : uint8_t {
 	Read,

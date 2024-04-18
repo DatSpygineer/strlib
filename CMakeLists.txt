@@ -17,9 +17,14 @@ if (STRLIB_FILESYS)
 	set(STRLIB_SOURCES ${STRLIB_SOURCES} ./strlib/io.cpp)
 endif()
 
+if (WIN32)
+	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
 add_library(strlib STATIC ${STRLIB_SOURCES})
 target_link_libraries(strlib PUBLIC fmt::fmt)
 target_include_directories(strlib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 if (STRLIB_FILESYS)
 	target_compile_definitions(strlib PUBLIC STRLIB_FILESYS=1)
 else()

@@ -181,6 +181,8 @@ public:
 
 	static String Date(const String& format);
 
+	static std::istream& GetLine(std::istream& is, String& line);
+
 	[[nodiscard]] inline String operator+ (char c) const { return { m_sString + c }; }
 	[[nodiscard]] inline String operator+ (String&& other) const {
 		String result = { m_sString + other.m_sString };
