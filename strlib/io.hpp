@@ -1,5 +1,6 @@
 #pragma once
 
+#if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 #include <optional>
 #include "string.hpp"
 
@@ -182,3 +183,4 @@ struct fmt::formatter<Path> : fmt::formatter<std::string_view> {
 		return fmt::formatter<std::string_view>::format(path.asString().stdStr(), ctx);
 	}
 };
+#endif

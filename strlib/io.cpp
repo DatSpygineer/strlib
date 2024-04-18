@@ -1,3 +1,4 @@
+#if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 #include "io.hpp"
 
 #include <filesystem>
@@ -479,3 +480,4 @@ bool Directory::create(bool recursive) const {
 bool Directory::remove(bool recursive) const {
 	return recursive ? fs::remove_all(m_path.asString().stdStr()) : fs::remove(m_path.asString().stdStr());
 }
+#endif
