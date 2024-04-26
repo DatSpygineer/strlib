@@ -274,9 +274,7 @@ public:
 	[[nodiscard]] inline String str() const { return m_ss.str(); }
 
 	inline char readChar() {
-		char c;
-		m_ss >> c;
-		return c;
+		return m_ss.get();
 	}
 	inline String read() {
 		String str;
@@ -286,7 +284,10 @@ public:
 	inline String read(size_t n) {
 		String str;
 		str.reserve(n);
-		m_ss.read(str.data(), static_cast<std::streamsize>(n));
+		for (size_t i = 0; i < n && !m_ss.eof(); i++) {
+			char c = static_cast<char>(m_ss.get());
+			str += c;
+		}
 		return str;
 	}
 	inline String readToEnd() {
@@ -309,6 +310,17 @@ public:
 	}
 	inline std::streamoff tell() {
 		return m_ss.tellg();
+	}
+	inline int peek() {
+		return m_ss.peek();
+	}
+	inline bool next() {
+		if (m_ss.eof()) return false;
+		m_ss.seekg(1, std::ios_base::cur);
+		return true;
+	}
+	inline bool eof() {
+		return m_ss.eof() || m_ss.peek() < 0;
 	}
 
 	inline std::istringstream& stdStream() { return m_ss; }
