@@ -5,7 +5,7 @@ project(strlib)
 set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(fmt)
-add_subdirectory(test)
+add_subdirectory(examples)
 
 set(STRLIB_SOURCES ./strlib/string.cpp)
 
