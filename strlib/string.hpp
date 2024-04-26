@@ -215,6 +215,7 @@ public:
 	[[nodiscard]] inline auto rend() const { return m_sString.rend(); }
 
 	static const size_t NoFind;
+	static const String Empty;
 
 	friend std::ostream& operator<< (std::ostream& os, const String& string);
 	friend std::istream& operator>> (std::istream& is, String& string);
