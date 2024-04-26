@@ -257,7 +257,8 @@ bool String::parse(short& value, int base) const {
 }
 bool String::parse(int& value, int base) const {
 	try {
-		value = std::stoi(m_sString, nullptr, base);
+		value = std::stoi(m_sString.starts_with("0b") || m_sString.starts_with("0B") ?
+				m_sString.substr(2) : m_sString, nullptr, base);
 	} catch (const std::exception& _) {
 		return false;
 	}
