@@ -136,6 +136,7 @@ public:
 class File {
 	FILE* m_pFile;
 public:
+	File(): m_pFile(nullptr) { }
 	File(const Path& path, FileMode mode);
 	~File();
 

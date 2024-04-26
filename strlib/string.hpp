@@ -89,6 +89,8 @@ public:
 	[[nodiscard]] inline size_type findLastOf(const String& str, size_t offset) const { return m_sString.find_last_of(str.m_sString, offset); }
 	[[nodiscard]] inline size_type findLastNotOf(const String& str) const { return m_sString.find_last_not_of(str.m_sString); }
 	[[nodiscard]] inline size_type findLastNotOf(const String& str, size_t offset) const { return m_sString.find_last_not_of(str.m_sString, offset); }
+	[[nodiscard]] inline bool contains(char c) { return find(c) != std::string::npos; }
+	[[nodiscard]] inline bool contains(const String& str) { return find(str) != std::string::npos; }
 
 	[[nodiscard]] inline String substr(size_t start) const { return m_sString.substr(start); }
 	[[nodiscard]] inline String substr(size_t start, size_t n) const { return m_sString.substr(start, n); }
@@ -227,6 +229,7 @@ public:
 	[[nodiscard]] inline auto rend() const { return m_sString.rend(); }
 
 	static const size_t NoFind;
+	static const String Empty;
 
 	friend std::ostream& operator<< (std::ostream& os, const String& string);
 	friend std::istream& operator>> (std::istream& is, String& string);

@@ -385,6 +385,7 @@ String String::FromWChar(wchar_t value) {
 }
 
 const size_t String::NoFind = std::string::npos;
+const String String::Empty = String { };
 
 std::vector<String> String::split(char delim) const {
 	String str = *this;
