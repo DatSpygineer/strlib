@@ -12,7 +12,7 @@ inline void PrintLn(const String& message, T&&... args) {
 	printf("%s\n", String::Format(message, args...).cStr());
 }
 
-inline String ReadLine() { return String::GetLine(std::cin); }
+inline String ReadLine() { std::string line; std::getline(std::cin, line); return line; }
 
 #if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 

@@ -1,6 +1,11 @@
 #pragma once
 
+#if __cplusplus < 201711UL
+	#error Unsupported C++ standard! Expected C++ 17 or newer!
+#endif
+
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -46,7 +51,12 @@ public:
 
 	inline std::string& stdStr() { return m_sString; }
 	[[nodiscard]] inline constexpr const std::string& stdStr() const { return m_sString; }
+
 	[[nodiscard]] std::wstring stdWStr() const;
+
+	[[nodiscard]] std::u8string asUtf8() const;
+	[[nodiscard]] std::u16string asUtf16() const;
+	[[nodiscard]] std::u32string asUtf32() const;
 
 	inline void reserve(size_t n) { m_sString.reserve(n); }
 #if __cplusplus < 202002L
@@ -143,19 +153,20 @@ public:
 	[[nodiscard]] int compareNoCase(const String& other, size_t offset, size_t n) const;
 	[[nodiscard]] int compareNoCase(const String& other, size_t this_offset, size_t offset, size_t n) const;
 
-	[[nodiscard]] bool parse(signed char& value, int base = 10) const;
-	[[nodiscard]] bool parse(short& value, int base = 10) const;
-	[[nodiscard]] bool parse(int& value, int base = 10) const;
-	[[nodiscard]] bool parse(long& value, int base = 10) const;
-	[[nodiscard]] bool parse(long long& value, int base = 10) const;
-	[[nodiscard]] bool parse(unsigned char& value, int base = 10) const;
-	[[nodiscard]] bool parse(unsigned short& value, int base = 10) const;
-	[[nodiscard]] bool parse(unsigned int& value, int base = 10) const;
-	[[nodiscard]] bool parse(unsigned long& value, int base = 10) const;
-	[[nodiscard]] bool parse(unsigned long long& value, int base = 10) const;
-	[[nodiscard]] bool parse(float& value) const;
-	[[nodiscard]] bool parse(double& value) const;
-	[[nodiscard]] bool parse(long double& value) const;
+	bool parse(bool& value) const;
+	bool parse(signed char& value, int base = 10) const;
+	bool parse(short& value, int base = 10) const;
+	bool parse(int& value, int base = 10) const;
+	bool parse(long& value, int base = 10) const;
+	bool parse(long long& value, int base = 10) const;
+	bool parse(unsigned char& value, int base = 10) const;
+	bool parse(unsigned short& value, int base = 10) const;
+	bool parse(unsigned int& value, int base = 10) const;
+	bool parse(unsigned long& value, int base = 10) const;
+	bool parse(unsigned long long& value, int base = 10) const;
+	bool parse(float& value) const;
+	bool parse(double& value) const;
+	bool parse(long double& value) const;
 
 	template<typename ...T>
 	inline static String Format(const String& format, T&&... args) {
@@ -165,6 +176,9 @@ public:
 	static String FromChar(char value);
 	static String FromWChar(wchar_t value);
 	static String FromWString(const std::wstring& str);
+	static String FromUtf8(const std::u8string& str);
+	static String FromUtf16(const std::u16string& str);
+	static String FromUtf32(const std::u32string& str);
 
 	static String From(uint8_t value, int base = 10);
 	static String From(uint16_t value, int base = 10);
@@ -180,8 +194,6 @@ public:
 	static String From(bool value);
 
 	static String Date(const String& format);
-
-	static std::istream& GetLine(std::istream& is, String& line);
 
 	[[nodiscard]] inline String operator+ (char c) const { return { m_sString + c }; }
 	[[nodiscard]] inline String operator+ (String&& other) const {
@@ -226,6 +238,78 @@ struct fmt::formatter<String> : fmt::formatter<std::string_view> {
 	auto format(const String& str, fmt::format_context& ctx) const {
 		return fmt::formatter<std::string_view>::format(str.stdStr(), ctx);
 	}
+};
+
+class StringBuilder {
+	std::ostringstream m_ss;
+public:
+	StringBuilder() = default;
+	explicit StringBuilder(const String& str): m_ss(str.stdStr()) { }
+
+	inline StringBuilder& append(char c) { m_ss << c; return *this; }
+	inline StringBuilder& append(const String& str) { m_ss << str; return *this; }
+	inline StringBuilder& appendLine(const String& str) { m_ss << str << std::endl; return *this; }
+
+	inline std::ostringstream& stdStream() { return m_ss; }
+	[[nodiscard]] inline const std::ostringstream& stdStream() const { return m_ss; }
+	[[nodiscard]] inline String str() const { return m_ss.str(); }
+};
+template<>
+struct fmt::formatter<StringBuilder> : fmt::formatter<std::string_view> {
+	auto format(const StringBuilder& sb, fmt::format_context& ctx) const {
+		return fmt::formatter<std::string_view>::format(sb.str().stdStr(), ctx);
+	}
+};
+
+class StringReader {
+	std::istringstream m_ss;
+public:
+	StringReader() = default;
+	explicit StringReader(const String& str): m_ss(str.stdStr()) { }
+
+	inline void str(const String& str) { m_ss.str(str.stdStr()); }
+	[[nodiscard]] inline String str() const { return m_ss.str(); }
+
+	inline char readChar() {
+		char c;
+		m_ss >> c;
+		return c;
+	}
+	inline String read() {
+		String str;
+		m_ss >> str;
+		return str;
+	}
+	inline String read(size_t n) {
+		String str;
+		str.reserve(n);
+		m_ss.read(str.data(), static_cast<std::streamsize>(n));
+		return str;
+	}
+	inline String readToEnd() {
+		auto start = m_ss.tellg();
+		m_ss.seekg(0, std::ios::end);
+		auto end = m_ss.tellg();
+		m_ss.seekg(start, std::ios::beg);
+
+		return read(end - start);
+	}
+	inline bool readLine(String& line) {
+		return static_cast<bool>(std::getline(m_ss, line.stdStr()));
+	}
+
+	inline void seek(std::streamoff i) {
+		m_ss.seekg(i);
+	}
+	inline void seek(std::streamoff i, std::ios_base::seekdir seekDir) {
+		m_ss.seekg(i, seekDir);
+	}
+	inline std::streamoff tell() {
+		return m_ss.tellg();
+	}
+
+	inline std::istringstream& stdStream() { return m_ss; }
+	[[nodiscard]] inline const std::istringstream& stdStream() const { return m_ss; }
 };
 
 class Exception : public std::exception {

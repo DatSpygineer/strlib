@@ -227,7 +227,18 @@ int String::compareNoCase(const String& other, size_t offset, size_t n) const {
 int String::compareNoCase(const String& other, size_t this_offset, size_t offset, size_t n) const {
 	return strncasecmp(m_sString.data() + this_offset, other.m_sString.data() + offset, n);
 }
-
+bool String::parse(bool& value) const {
+	if (m_sString == "true" || m_sString == "false") {
+		value = m_sString == "true";
+		return true;
+	}
+	int i;
+	if (parse(i)) {
+		value = i != 0;
+		return true;
+	}
+	return false;
+}
 bool String::parse(signed char& value, int base) const {
 	try {
 		value = static_cast<signed char>(std::stoi(m_sString, nullptr, base));
@@ -337,6 +348,16 @@ std::wstring String::stdWStr() const {
 	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(m_sString);
 }
 
+std::u8string String::asUtf8() const {
+	return std::wstring_convert<std::codecvt_utf8<char8_t>, char8_t>().from_bytes(m_sString);
+}
+std::u16string String::asUtf16() const {
+	return std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t>().from_bytes(m_sString);
+}
+std::u32string String::asUtf32() const {
+	return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().from_bytes(m_sString);
+}
+
 String String::FromChar(char value) {
 	return { value, 1 };
 }
@@ -344,6 +365,19 @@ String String::FromWString(const std::wstring& str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
 	return convert.to_bytes(str);
 }
+String String::FromUtf8(const std::u8string& str) {
+	std::wstring_convert<std::codecvt_utf8<char8_t>, char8_t> convert;
+	return convert.to_bytes(str);
+}
+String String::FromUtf16(const std::u16string& str) {
+	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+	return convert.to_bytes(str);
+}
+String String::FromUtf32(const std::u32string& str) {
+	std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+	return convert.to_bytes(str);
+}
+
 String String::FromWChar(wchar_t value) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
 	wchar_t temp[2] = { value, 0 };
