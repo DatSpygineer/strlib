@@ -12,8 +12,6 @@ inline void PrintLn(const String& message, T&&... args) {
 	printf("%s\n", String::Format(message, args...).cStr());
 }
 
-inline String ReadLine() { std::string line; std::getline(std::cin, line); return line; }
-
 #if !defined(STRLIB_FILESYS) || STRLIB_FILESYS == 1
 
 enum class FileMode : uint8_t {
@@ -51,7 +49,7 @@ enum class SpecialDirectory {
 	Temp
 };
 
-class Path {
+class STRLIB_API Path {
 	String m_sInternalString;
 public:
 	Path(): m_sInternalString() { }
@@ -133,7 +131,7 @@ public:
 	static Path GetSpecialPath(SpecialDirectory directory);
 };
 
-class File {
+class STRLIB_API File {
 	FILE* m_pFile;
 public:
 	File(): m_pFile(nullptr) { }
@@ -173,7 +171,7 @@ public:
 	[[nodiscard]] inline constexpr bool isOpen() const { return m_pFile != nullptr; }
 };
 
-class Directory {
+class STRLIB_API Directory {
 	Path m_path;
 public:
 	explicit Directory(Path&& path) noexcept: m_path(std::move(path)) { }
@@ -191,9 +189,17 @@ public:
 
 inline Path operator""_P(const char* cstr, size_t len) { return Path { String {cstr, len}}; }
 template<>
-struct fmt::formatter<Path> : fmt::formatter<std::string_view> {
+struct STRLIB_API fmt::formatter<Path> : fmt::formatter<std::string_view> {
 	auto format(const Path& path, fmt::format_context& ctx) const {
 		return fmt::formatter<std::string_view>::format(path.asString().stdStr(), ctx);
 	}
 };
+
+#ifdef STRLIB_HEADER_ONLY
+	#ifndef STRLIB_IO_IMPL
+		#define STRLIB_IO_IMPL
+		#include "io.cpp"
+	#endif
+#endif
+
 #endif

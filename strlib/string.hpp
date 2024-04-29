@@ -11,7 +11,9 @@
 #include <algorithm>
 #include <fmt/format.h>
 
-class String {
+#include "api.hpp"
+
+class STRLIB_API String {
 	std::string m_sString;
 public:
 	String(): m_sString() { }
@@ -237,13 +239,13 @@ public:
 
 inline String operator""_S(const char* cstr, size_t len) { return { cstr, len }; }
 template<>
-struct fmt::formatter<String> : fmt::formatter<std::string_view> {
+struct STRLIB_API fmt::formatter<String> : fmt::formatter<std::string_view> {
 	auto format(const String& str, fmt::format_context& ctx) const {
 		return fmt::formatter<std::string_view>::format(str.stdStr(), ctx);
 	}
 };
 
-class StringBuilder {
+class STRLIB_API StringBuilder {
 	std::ostringstream m_ss;
 public:
 	StringBuilder() = default;
@@ -258,13 +260,13 @@ public:
 	[[nodiscard]] inline String str() const { return m_ss.str(); }
 };
 template<>
-struct fmt::formatter<StringBuilder> : fmt::formatter<std::string_view> {
+struct STRLIB_API fmt::formatter<StringBuilder> : fmt::formatter<std::string_view> {
 	auto format(const StringBuilder& sb, fmt::format_context& ctx) const {
 		return fmt::formatter<std::string_view>::format(sb.str().stdStr(), ctx);
 	}
 };
 
-class StringReader {
+class STRLIB_API StringReader {
 	std::istringstream m_ss;
 public:
 	StringReader() = default;
@@ -327,7 +329,7 @@ public:
 	[[nodiscard]] inline const std::istringstream& stdStream() const { return m_ss; }
 };
 
-class Exception : public std::exception {
+class STRLIB_API Exception : public std::exception {
 	String m_sMessage;
 public:
 	explicit Exception(String&& message) noexcept: m_sMessage(std::move(message)) { }
@@ -338,3 +340,11 @@ public:
 	[[nodiscard]] virtual String message() const noexcept { return m_sMessage; }
 	[[nodiscard]] const char* what() const noexcept override { return message().cStr(); }
 };
+
+
+#ifdef STRLIB_HEADER_ONLY
+	#ifndef STRLIB_STRING_IMPL
+		#define STRLIB_STRING_IMPL
+		#include "io.cpp"
+	#endif
+#endif
