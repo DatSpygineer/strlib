@@ -237,6 +237,14 @@ public:
 	friend std::istream& operator>> (std::istream& is, String& string);
 };
 
+template<>
+struct std::hash<String> {
+	std::size_t operator()(const String& str) const noexcept {
+		auto hasher = std::hash<std::string> { };
+		return hasher(str.stdStr());
+	}
+};
+
 inline String operator""_S(const char* cstr, size_t len) { return { cstr, len }; }
 template<>
 struct STRLIB_API fmt::formatter<String> : fmt::formatter<std::string_view> {
