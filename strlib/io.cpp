@@ -21,14 +21,6 @@ namespace fs = std::filesystem;
 	#define STRLIB_PATH_SEP '\\'
 #endif
 
-inline constexpr bool EndsWithPathSeparator(const String& str) {
-	return str.startsWith('/')
-#ifdef _WIN32
-	|| str.startsWith('\\')
-#endif
-	;
-}
-
 Path& Path::append(const String& str) {
 	m_sInternalString = String {
 		(std::filesystem::path(m_sInternalString.stdStr()) / std::filesystem::path(str.stdStr())).string()

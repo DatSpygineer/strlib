@@ -16,6 +16,7 @@
 class STRLIB_API String {
 	std::string m_sString;
 public:
+
 	String(): m_sString() { }
 	String(const char* cstr): m_sString(cstr) { }			// NOLINT: Implicit conversion for backwards compatibility
 	String(const char* cstr, size_t len): m_sString(cstr, len) { }
@@ -54,14 +55,15 @@ public:
 	inline std::string& stdStr() { return m_sString; }
 	[[nodiscard]] inline constexpr const std::string& stdStr() const { return m_sString; }
 
+#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED)
 	[[nodiscard]] std::wstring stdWStr() const;
-
 	[[nodiscard]] std::u8string asUtf8() const;
 	[[nodiscard]] std::u16string asUtf16() const;
 	[[nodiscard]] std::u32string asUtf32() const;
+#endif
 
 	inline void reserve(size_t n) { m_sString.reserve(n); }
-#if __cplusplus < 202002L
+#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED)
 	[[nodiscard]] inline bool startsWith(char c) const { return m_sString.front() == c; }
 	[[nodiscard]] inline bool startsWith(const String& str) const { return m_sString.substr(0, str.length()) == str.m_sString; }
 	[[nodiscard]] inline bool endsWith(char c) const { return m_sString.back() == c; }
@@ -178,11 +180,13 @@ public:
 	}
 
 	static String FromChar(char value);
+#if __cplusplus < 202002L // Disable deprecated string conversion
 	static String FromWChar(wchar_t value);
 	static String FromWString(const std::wstring& str);
 	static String FromUtf8(const std::u8string& str);
 	static String FromUtf16(const std::u16string& str);
 	static String FromUtf32(const std::u32string& str);
+#endif
 
 	static String From(uint8_t value, int base = 10);
 	static String From(uint16_t value, int base = 10);
@@ -353,6 +357,6 @@ public:
 #ifdef STRLIB_HEADER_ONLY
 	#ifndef STRLIB_STRING_IMPL
 		#define STRLIB_STRING_IMPL
-		#include "io.cpp"
+		#include "string.cpp"
 	#endif
 #endif

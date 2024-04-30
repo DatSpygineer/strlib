@@ -7,14 +7,20 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(fmt)
 add_subdirectory(examples)
 
-set(STRLIB_SOURCES ./strlib/string.cpp)
+if(STRLIB_HEADER_ONLY)
+	set(SLIB_SRC_EXT hpp)
+else()
+	set(SLIB_SRC_EXT cpp)
+endif()
+
+set(STRLIB_SOURCES ./strlib/string.${SLIB_SRC_EXT})
 
 if (NOT DEFINED STRLIB_FILESYS)
 	set(STRLIB_FILESYS ON)
 endif()
 
 if (STRLIB_FILESYS)
-	set(STRLIB_SOURCES ${STRLIB_SOURCES} ./strlib/io.cpp)
+	set(STRLIB_SOURCES ${STRLIB_SOURCES} ./strlib/io.${SLIB_SRC_EXT})
 endif()
 
 if (WIN32)

@@ -345,10 +345,10 @@ bool String::parse(long double& value) const {
 	return true;
 }
 
+#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED)
 std::wstring String::stdWStr() const {
 	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(m_sString);
 }
-
 std::u8string String::asUtf8() const {
 	return std::wstring_convert<std::codecvt_utf8<char8_t>, char8_t>().from_bytes(m_sString);
 }
@@ -358,10 +358,12 @@ std::u16string String::asUtf16() const {
 std::u32string String::asUtf32() const {
 	return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().from_bytes(m_sString);
 }
+#endif
 
 String String::FromChar(char value) {
 	return { value, 1 };
 }
+#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED)
 String String::FromWString(const std::wstring& str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
 	return convert.to_bytes(str);
@@ -384,6 +386,7 @@ String String::FromWChar(wchar_t value) {
 	wchar_t temp[2] = { value, 0 };
 	return convert.to_bytes(temp);
 }
+#endif
 
 const size_t String::NoFind = std::string::npos;
 const String String::Empty = String { };
