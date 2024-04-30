@@ -370,9 +370,7 @@ File::File(const Path& path, FileMode mode) {
 	m_pFile = fopen(path.asString().cStr(), mode_str);
 }
 File::~File() {
-	if (m_pFile != nullptr) {
-		fclose(m_pFile);
-	}
+	close();
 }
 
 char File::read() const {
@@ -441,6 +439,12 @@ bool File::writeObject(const T& result) {
 template<typename T>
 bool File::writeObjects(const std::vector<T>& result) {
 	return fwrite(result.data(), sizeof(T), result.size()) == result.size();
+}
+void File::close() {
+	if (m_pFile != nullptr) {
+		fclose(m_pFile);
+		m_pFile = nullptr;
+	}
 }
 
 std::vector<Path> Directory::files(const String& pattern) const {

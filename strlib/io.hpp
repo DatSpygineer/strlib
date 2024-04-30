@@ -169,6 +169,7 @@ public:
 	[[nodiscard]] inline constexpr bool eof() const { return feof(m_pFile) != 0; }
 
 	[[nodiscard]] inline constexpr bool isOpen() const { return m_pFile != nullptr; }
+	void close();
 };
 
 class STRLIB_API Directory {
