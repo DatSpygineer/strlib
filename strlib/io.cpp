@@ -435,11 +435,11 @@ size_t File::size() const {
 }
 
 template<typename T>
-bool File::write(const T& result) {
+bool File::writeObject(const T& result) {
 	return fwrite(&result, sizeof(T), 1, m_pFile) > 0;
 }
 template<typename T>
-bool File::write(const std::vector<T>& result) {
+bool File::writeObjects(const std::vector<T>& result) {
 	return fwrite(result.data(), sizeof(T), result.size()) == result.size();
 }
 

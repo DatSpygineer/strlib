@@ -153,9 +153,9 @@ public:
 	void writeBytes(const std::vector<uint8_t>& data) const;
 
 	template<typename T>
-	bool write(const T& result);
+	bool writeObject(const T& result);
 	template<typename T>
-	bool write(const std::vector<T>& result);
+	bool writeObjects(const std::vector<T>& result);
 
 	[[nodiscard]] size_t size() const;
 
