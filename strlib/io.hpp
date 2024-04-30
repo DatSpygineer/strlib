@@ -92,10 +92,10 @@ public:
 
 	[[nodiscard]] std::optional<File> openFile(FileMode mode) const;
 	[[nodiscard]] std::optional<Directory> createDirectory(bool recursive) const;
-	[[nodiscard]] bool remove(bool recursive) const;
-	[[nodiscard]] bool move(const Path& dest) const;
-	[[nodiscard]] inline constexpr bool rename(const Path& dest) const { return move(dest); }
-	[[nodiscard]] bool copy(const Path& dest) const;
+	bool remove(bool recursive) const;
+	bool move(const Path& dest) const;
+	inline constexpr bool rename(const Path& dest) const { return move(dest); }
+	bool copy(const Path& dest) const;
 
 	[[nodiscard]] inline String& asString() { return m_sInternalString; }
 	[[nodiscard]] inline constexpr const String& asString() const { return m_sInternalString; }
@@ -143,9 +143,9 @@ public:
 	[[nodiscard]] size_t readBytes(std::vector<uint8_t>& data, size_t n) const;
 
 	template<typename T>
-	[[nodiscard]] bool read(T& result) const;
+	bool read(T& result) const;
 	template<typename T>
-	[[nodiscard]] bool read(std::vector<T>& result, size_t count) const;
+	bool read(std::vector<T>& result, size_t count) const;
 
 	void write(char c) const;
 	void write(const String& str) const;
@@ -153,9 +153,9 @@ public:
 	void writeBytes(const std::vector<uint8_t>& data) const;
 
 	template<typename T>
-	[[nodiscard]] bool write(const T& result);
+	bool write(const T& result);
 	template<typename T>
-	[[nodiscard]] bool write(const std::vector<T>& result);
+	bool write(const std::vector<T>& result);
 
 	[[nodiscard]] size_t size() const;
 
@@ -180,8 +180,8 @@ public:
 	Directory(const Directory& directory) = default;
 
 	[[nodiscard]] bool exists() const;
-	[[nodiscard]] bool create(bool recursive) const;
-	[[nodiscard]] bool remove(bool recursive) const;
+	bool create(bool recursive) const;
+	bool remove(bool recursive) const;
 
 	[[nodiscard]] std::vector<Path> files(const String& pattern = "*.*") const;
 };
