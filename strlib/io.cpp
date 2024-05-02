@@ -199,33 +199,6 @@ bool Path::hasExtension() const {
 	return fs::path(m_sInternalString.stdStr()).has_extension();
 }
 
-std::optional<File> Path::openFile(FileMode mode, bool binary) const {
-	File f { m_sInternalString, mode, binary };
-	if (f.isOpen()) {
-		return std::make_optional(f);
-	}
-	return std::nullopt;
-}
-std::optional<File> Path::openRead(bool binary) const {
-	return openFile(FileMode::Read, binary);
-}
-std::optional<File> Path::openWrite(bool binary) const {
-	return openFile(FileMode::Write, binary);
-}
-std::optional<File> Path::openAppend(bool binary) const {
-	return openFile(FileMode::Append, binary);
-}
-std::optional<File> Path::createOrOpenAppend(bool binary) const {
-	return exists() ? openAppend(binary) : openWrite(binary);
-}
-std::optional<Directory> Path::createDirectory(bool recursive) const {
-	Directory dir { m_sInternalString };
-	if (dir.create(recursive)) {
-		return std::make_optional(dir);
-	}
-	return std::nullopt;
-}
-
 bool Path::remove(bool recursive) const {
 	return recursive ? fs::remove_all(m_sInternalString.stdStr()) : fs::remove(m_sInternalString.stdStr());
 }
@@ -369,52 +342,6 @@ Path Path::GetSpecialPath(SpecialDirectory directory) {
 	}
 }
 
-std::optional<String> Path::readAllString() const {
-	if (auto f = openRead(); f.has_value()) {
-		return std::make_optional(f->readToEnd());
-	}
-	return std::nullopt;
-}
-std::vector<String> Path::readAllLines() const {
-	std::vector<String> result;
-	if (auto f = openRead(); f.has_value()) {
-		String line = f->readLine();
-		while (!line.isEmpty()) {
-			result.push_back(line);
-			line = f->readLine();
-		}
-	}
-	return result;
-}
-std::vector<uint8_t> Path::readAllBytes() const {
-	std::vector<uint8_t> result;
-	if (auto f = openRead(); f.has_value()) {
-		f->readBytes(result, f->size());
-	}
-	return result;
-}
-bool Path::writeAllString(const String& value) const {
-	if (auto f = openWrite(); f.has_value()) {
-		return f->write(value);
-	}
-	return false;
-}
-bool Path::writeAllLines(const std::vector<String>& lines) const {
-	if (auto f = openWrite(); f.has_value()) {
-		for (const auto& line : lines) {
-			f->writeLine(line);
-		}
-	}
-	return false;
-}
-bool Path::writeAllBytes(const std::vector<uint8_t>& data) const {
-	if (auto f = openWrite(); f.has_value()) {
-		f->writeBytes(data);
-		return true;
-	}
-	return false;
-}
-
 File::File(const Path& path, FileMode mode, bool binary) {
 	const char* mode_str;
 	switch (mode) {
@@ -425,7 +352,7 @@ File::File(const Path& path, FileMode mode, bool binary) {
 		case FileMode::ReadWrite: mode_str = binary ? "wb+" : "w+"; break;
 		case FileMode::ReadAppend: mode_str = binary ? "ab+" : "a+"; break;
 	}
-	m_pFile = fopen(path.asString().cStr(), mode_str);
+	m_pFile = fopen((path.asString() + '\0').cStr(), mode_str);
 }
 File::~File() {
 	close();
