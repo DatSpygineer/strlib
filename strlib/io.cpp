@@ -370,11 +370,13 @@ char File::read() const {
 	return static_cast<char>(fgetc(m_pFile));
 }
 String File::readToEnd() const {
-	String str;
-	str.reserve(size());
-	fread(str.data(), str.capacity(), 1, m_pFile);
-	str += '\0';
-	return str;
+	StringBuilder sb;
+	int c = fgetc(m_pFile);
+	while (c != EOF) {
+		sb.append(static_cast<char>(c));
+		c = fgetc(m_pFile);
+	}
+	return sb.str() + '\0';
 }
 
 size_t File::readBytes(std::vector<uint8_t>& data, size_t n) const {
