@@ -90,8 +90,15 @@ public:
 
 	[[nodiscard]] bool matches(const String& pattern) const;
 
-	[[nodiscard]] std::optional<File> openFile(FileMode mode) const;
+	[[nodiscard]] std::optional<File> openFile(FileMode mode, bool binary = false) const;
+	[[nodiscard]] std::optional<File> openRead(bool binary = false) const;
+	[[nodiscard]] std::optional<File> openWrite(bool binary = false) const;
+	[[nodiscard]] std::optional<File> openAppend(bool binary = false) const;
+	[[nodiscard]] std::optional<File> createOrOpenAppend(bool binary = false) const;
 	[[nodiscard]] std::optional<Directory> createDirectory(bool recursive) const;
+	[[nodiscard]] std::optional<String> readAllString() const;
+	[[nodiscard]] std::vector<String> readAllLines() const;
+	[[nodiscard]] std::vector<uint8_t> readAllBytes() const;
 	bool remove(bool recursive) const;
 	bool move(const Path& dest) const;
 	inline constexpr bool rename(const Path& dest) const { return move(dest); }
@@ -135,22 +142,23 @@ class STRLIB_API File {
 	FILE* m_pFile;
 public:
 	File(): m_pFile(nullptr) { }
-	File(const Path& path, FileMode mode);
+	File(const Path& path, FileMode mode, bool binary = false);
 	~File();
 
 	[[nodiscard]] char read() const;
 	[[nodiscard]] String readToEnd() const;
-	[[nodiscard]] size_t readBytes(std::vector<uint8_t>& data, size_t n) const;
+	size_t readBytes(std::vector<uint8_t>& data, size_t n) const;
+	[[nodiscard]] String readLine() const;
 
 	template<typename T>
 	bool read(T& result) const;
 	template<typename T>
 	bool read(std::vector<T>& result, size_t count) const;
 
-	void write(char c) const;
-	void write(const String& str) const;
-	void writeLine(const String& str) const;
-	void writeBytes(const std::vector<uint8_t>& data) const;
+	bool write(char c) const;
+	bool write(const String& str) const;
+	bool writeLine(const String& str) const;
+	bool writeBytes(const std::vector<uint8_t>& data) const;
 
 	template<typename T>
 	bool writeObject(const T& result);
@@ -167,6 +175,8 @@ public:
 
 	inline constexpr void flush() const { fflush(m_pFile); }
 	[[nodiscard]] inline constexpr bool eof() const { return feof(m_pFile) != 0; }
+
+	[[nodiscard]] inline constexpr bool hasError() const { return ferror(m_pFile); }
 
 	[[nodiscard]] inline constexpr bool isOpen() const { return m_pFile != nullptr; }
 	void close();

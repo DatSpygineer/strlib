@@ -199,12 +199,24 @@ bool Path::hasExtension() const {
 	return fs::path(m_sInternalString.stdStr()).has_extension();
 }
 
-std::optional<File> Path::openFile(FileMode mode) const {
-	File f { m_sInternalString, mode };
+std::optional<File> Path::openFile(FileMode mode, bool binary) const {
+	File f { m_sInternalString, mode, binary };
 	if (f.isOpen()) {
 		return std::make_optional(f);
 	}
 	return std::nullopt;
+}
+std::optional<File> Path::openRead(bool binary) const {
+	return openFile(FileMode::Read, binary);
+}
+std::optional<File> Path::openWrite(bool binary) const {
+	return openFile(FileMode::Write, binary);
+}
+std::optional<File> Path::openAppend(bool binary) const {
+	return openFile(FileMode::Append, binary);
+}
+std::optional<File> Path::createOrOpenAppend(bool binary) const {
+	return exists() ? openAppend(binary) : openWrite(binary);
 }
 std::optional<Directory> Path::createDirectory(bool recursive) const {
 	Directory dir { m_sInternalString };
@@ -357,15 +369,40 @@ Path Path::GetSpecialPath(SpecialDirectory directory) {
 	}
 }
 
-File::File(const Path& path, FileMode mode) {
+std::optional<String> Path::readAllString() const {
+	if (auto f = openRead(); f.has_value()) {
+		return std::make_optional(f->readToEnd());
+	}
+	return std::nullopt;
+}
+std::vector<String> Path::readAllLines() const {
+	std::vector<String> result;
+	if (auto f = openRead(); f.has_value()) {
+		String line = f->readLine();
+		while (!line.isEmpty()) {
+			result.push_back(line);
+			line = f->readLine();
+		}
+	}
+	return result;
+}
+std::vector<uint8_t> Path::readAllBytes() const {
+	std::vector<uint8_t> result;
+	if (auto f = openRead(); f.has_value()) {
+		f->readBytes(result, f->size());
+	}
+	return result;
+}
+
+File::File(const Path& path, FileMode mode, bool binary) {
 	const char* mode_str;
 	switch (mode) {
-		case FileMode::Read: mode_str = "r"; break;
-		case FileMode::ReadOrCreate: mode_str = "r+"; break;
-		case FileMode::Write: mode_str = "w"; break;
-		case FileMode::Append: mode_str = "a"; break;
-		case FileMode::ReadWrite: mode_str = "w+"; break;
-		case FileMode::ReadAppend: mode_str = "a+"; break;
+		case FileMode::Read: mode_str = binary ? "rb" : "r"; break;
+		case FileMode::ReadOrCreate: mode_str = binary ? "rb+" : "r+"; break;
+		case FileMode::Write: mode_str = binary ? "wb" : "w"; break;
+		case FileMode::Append: mode_str = binary ? "ab" : "a"; break;
+		case FileMode::ReadWrite: mode_str = binary ? "wb+" : "w+"; break;
+		case FileMode::ReadAppend: mode_str = binary ? "ab+" : "a+"; break;
 	}
 	m_pFile = fopen(path.asString().cStr(), mode_str);
 }
@@ -380,6 +417,7 @@ String File::readToEnd() const {
 	String str;
 	str.reserve(size());
 	fread(str.data(), str.capacity(), 1, m_pFile);
+	str += '\0';
 	return str;
 }
 
@@ -393,10 +431,23 @@ size_t File::readBytes(std::vector<uint8_t>& data, size_t n) const {
 
 	return fread(data.data(), n, 1, m_pFile);
 }
+String File::readLine() const {
+	if (feof(m_pFile)) {
+		return { };
+	}
+
+	String result { };
+	int c = fgetc(m_pFile);
+	while (c != '\n' && c != EOF) {
+		result += static_cast<char>(c);
+		c = fgetc(m_pFile);
+	}
+	return result;
+}
 
 template<typename T>
 bool File::read(T& result) const {
-	return fread(&result, sizeof(T), 1, m_pFile) > 0;
+	return fread(&result, sizeof(T), 1, m_pFile) > 0 && !ferror(m_pFile);
 }
 template<typename T>
 bool File::read(std::vector<T>& result, size_t count) const {
@@ -407,21 +458,26 @@ bool File::read(std::vector<T>& result, size_t count) const {
 		result.reserve(count);
 	}
 
-	return fread(result.data(), sizeof(T), count, m_pFile) == count;
+	fread(result.data(), sizeof(T), count, m_pFile) == count;
+	return !ferror(m_pFile);
 }
 
 
-void File::write(char c) const {
+bool File::write(char c) const {
 	fputc(c, m_pFile);
+	return !ferror(m_pFile);
 }
-void File::write(const String& str) const {
-	fputs(str.cStr(), m_pFile);
+bool File::write(const String& str) const {
+	fprintf(m_pFile, "%s", str.cStr());
+	return !ferror(m_pFile);
 }
-void File::writeLine(const String& str) const {
+bool File::writeLine(const String& str) const {
 	fprintf(m_pFile, "%s\n", str.cStr());
+	return !ferror(m_pFile);
 }
-void File::writeBytes(const std::vector<uint8_t>& data) const {
+bool File::writeBytes(const std::vector<uint8_t>& data) const {
 	fwrite(data.data(), sizeof(uint8_t), data.size(), m_pFile);
+	return !ferror(m_pFile);
 }
 
 size_t File::size() const {
@@ -434,11 +490,13 @@ size_t File::size() const {
 
 template<typename T>
 bool File::writeObject(const T& result) {
-	return fwrite(&result, sizeof(T), 1, m_pFile) > 0;
+	fwrite(&result, sizeof(T), 1, m_pFile);
+	return !ferror(m_pFile);
 }
 template<typename T>
 bool File::writeObjects(const std::vector<T>& result) {
-	return fwrite(result.data(), sizeof(T), result.size()) == result.size();
+	fwrite(result.data(), sizeof(T), result.size()) == result.size();
+	return !ferror(m_pFile);
 }
 void File::close() {
 	if (m_pFile != nullptr) {
