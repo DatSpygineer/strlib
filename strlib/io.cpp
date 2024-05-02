@@ -393,6 +393,27 @@ std::vector<uint8_t> Path::readAllBytes() const {
 	}
 	return result;
 }
+bool Path::writeAllString(const String& value) const {
+	if (auto f = openWrite(); f.has_value()) {
+		return f->write(value);
+	}
+	return false;
+}
+bool Path::writeAllLines(const std::vector<String>& lines) const {
+	if (auto f = openWrite(); f.has_value()) {
+		for (const auto& line : lines) {
+			f->writeLine(line);
+		}
+	}
+	return false;
+}
+bool Path::writeAllBytes(const std::vector<uint8_t>& data) const {
+	if (auto f = openWrite(); f.has_value()) {
+		f->writeBytes(data);
+		return true;
+	}
+	return false;
+}
 
 File::File(const Path& path, FileMode mode, bool binary) {
 	const char* mode_str;

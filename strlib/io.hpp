@@ -99,6 +99,9 @@ public:
 	[[nodiscard]] std::optional<String> readAllString() const;
 	[[nodiscard]] std::vector<String> readAllLines() const;
 	[[nodiscard]] std::vector<uint8_t> readAllBytes() const;
+	bool writeAllString(const String& value) const;
+	bool writeAllLines(const std::vector<String>& lines) const;
+	bool writeAllBytes(const std::vector<uint8_t>& data) const;
 	bool remove(bool recursive) const;
 	bool move(const Path& dest) const;
 	inline constexpr bool rename(const Path& dest) const { return move(dest); }
