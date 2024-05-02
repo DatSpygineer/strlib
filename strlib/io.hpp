@@ -90,6 +90,8 @@ public:
 
 	[[nodiscard]] bool matches(const String& pattern) const;
 
+	[[nodiscard]] std::optional<Directory> createDirectory(bool recursive) const;
+
 	bool remove(bool recursive) const;
 	bool move(const Path& dest) const;
 	inline constexpr bool rename(const Path& dest) const { return move(dest); }

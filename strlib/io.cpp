@@ -199,6 +199,14 @@ bool Path::hasExtension() const {
 	return fs::path(m_sInternalString.stdStr()).has_extension();
 }
 
+std::optional<Directory> Path::createDirectory(bool recursive) const {
+	Directory dir { m_sInternalString };
+	if (dir.create(recursive)) {
+		return std::make_optional(dir);
+	}
+	return std::nullopt;
+}
+
 bool Path::remove(bool recursive) const {
 	return recursive ? fs::remove_all(m_sInternalString.stdStr()) : fs::remove(m_sInternalString.stdStr());
 }
