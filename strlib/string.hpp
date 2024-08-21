@@ -63,7 +63,7 @@ public:
 #endif
 
 	inline void reserve(size_t n) { m_sString.reserve(n); }
-#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED)
+#if __cplusplus < 202002L
 	[[nodiscard]] inline bool startsWith(char c) const { return m_sString.front() == c; }
 	[[nodiscard]] inline bool startsWith(const String& str) const { return m_sString.substr(0, str.length()) == str.m_sString; }
 	[[nodiscard]] inline bool endsWith(char c) const { return m_sString.back() == c; }
@@ -180,7 +180,7 @@ public:
 	}
 
 	static String FromChar(char value);
-#if __cplusplus < 202002L // Disable deprecated string conversion
+#if __cplusplus < 202002L || defined(STRLIB_ALLOW_DEPRECATED) // Disable deprecated string conversion
 	static String FromWChar(wchar_t value);
 	static String FromWString(const std::wstring& str);
 	static String FromUtf8(const std::u8string& str);

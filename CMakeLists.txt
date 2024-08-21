@@ -15,9 +15,8 @@ endif()
 
 set(STRLIB_SOURCES ./strlib/string.${SLIB_SRC_EXT})
 
-if (NOT DEFINED STRLIB_FILESYS)
-	set(STRLIB_FILESYS ON)
-endif()
+option(STRLIB_FILESYS "Enable filesystem module" ON)
+option(STRLIB_ALLOW_DEPRECATED "Allow usage of functions deprecated in C++20?" OFF)
 
 if (STRLIB_FILESYS)
 	set(STRLIB_SOURCES ${STRLIB_SOURCES} ./strlib/io.${SLIB_SRC_EXT})
@@ -64,4 +63,8 @@ else()
 	else()
 		target_compile_definitions(strlib PUBLIC STRLIB_FILESYS=0)
 	endif()
+endif()
+
+if (STRLIB_ALLOW_DEPRECATED)
+	target_compile_definitions(strlib PRIVATE STRLIB_ALLOW_DEPRECATED=1)
 endif()
