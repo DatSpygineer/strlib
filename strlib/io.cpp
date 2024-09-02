@@ -421,6 +421,13 @@ bool File::read(std::vector<T>& result, size_t count) const {
 }
 
 
+bool File::read(String& result, size_t expected_length) const {
+	for (size_t i = 0; i < expected_length && !feof(m_pFile); i++) {
+		result.append(static_cast<char>(fgetc(m_pFile)));
+	}
+	return result.length() == expected_length;
+}
+
 bool File::write(char c) const {
 	fputc(c, m_pFile);
 	return !ferror(m_pFile);

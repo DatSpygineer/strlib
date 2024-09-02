@@ -53,6 +53,7 @@ class STRLIB_API Path {
 	String m_sInternalString;
 public:
 	Path(): m_sInternalString() { }
+	Path(const char* cstr): m_sInternalString(cstr) { } // NOLINT: Implicit conversion intended
 	Path(const String& str): m_sInternalString(str) { } // NOLINT: Implicit conversion intended
 	Path(Path&& path) noexcept: m_sInternalString(std::move(path.m_sInternalString)) { path.m_sInternalString = ""; }
 	Path(const Path& path) = default;
@@ -148,6 +149,8 @@ public:
 	template<typename T>
 	bool read(std::vector<T>& result, size_t count) const;
 
+	bool read(String& result, size_t expected_length) const;
+
 	bool write(char c) const;
 	bool write(const String& str) const;
 	bool writeLine(const String& str) const;
@@ -160,8 +163,8 @@ public:
 
 	[[nodiscard]] size_t size() const;
 
-	[[nodiscard]] inline constexpr bool seek(FileSeekOrigin origin, int offset) const {
-		return fseek(m_pFile, static_cast<long>(origin), offset) >= 0;
+	inline constexpr bool seek(FileSeekOrigin origin, long offset) const {
+		return fseek(m_pFile, offset, static_cast<int>(origin)) >= 0;
 	}
 	[[nodiscard]] inline constexpr size_t tell() const { return ftell(m_pFile); }
 	[[nodiscard]] inline constexpr size_t position() const { return ftell(m_pFile); }
